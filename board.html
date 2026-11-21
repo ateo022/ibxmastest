@@ -1,0 +1,591 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IB Christmas Photo Bingo</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700&family=Playfair+Display:wght@700;800&display=swap');
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  padding: 10px 12px 24px;
+  font-family: 'DM Sans', sans-serif;
+  background: #f5eee2;
+  color: #244735;
+  text-align: center;
+}
+
+.container {
+  width: 100%;
+  max-width: 560px;
+  margin: auto;
+}
+
+header {
+  padding: 5px 0 10px;
+}
+
+.eyebrow {
+  color: #b18a48;
+  font-size: 10px;
+  letter-spacing: 3px;
+  font-weight: 700;
+}
+
+h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(29px, 7vw, 43px);
+  color: #a12e32;
+  margin: 7px 0;
+  line-height: 1.05;
+}
+
+.subtitle {
+  font-size: 11px;
+  color: #657568;
+  margin: 5px 0;
+}
+
+.decoration {
+  font-size: 18px;
+  margin: 5px;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 7px;
+  background: #244735;
+  padding: 8px;
+  border-radius: 13px;
+  box-shadow: 0 6px 20px #24473525;
+}
+
+/* Portrait photo squares */
+.square {
+  aspect-ratio: 3 / 4;
+  position: relative;
+  overflow: hidden;
+  background: #fffaf0;
+  border: 2px solid #d9cba9;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 5px;
+  min-width: 0;
+}
+
+.square:active {
+  transform: scale(.98);
+}
+
+.square img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: none;
+}
+
+.square.has-photo img {
+  display: block;
+}
+
+.square .emoji {
+  z-index: 1;
+  font-size: clamp(20px, 5vw, 28px);
+  margin-bottom: 5px;
+}
+
+.square .prompt {
+  z-index: 1;
+  font-size: clamp(9px, 2.6vw, 12px);
+  font-weight: 700;
+  line-height: 1.3;
+  color: #244735;
+  padding: 5px;
+  background: #fffaf0e8;
+  border-radius: 5px;
+}
+
+.square.has-photo .emoji {
+  display: none;
+}
+
+.square.has-photo .prompt {
+  position: absolute;
+  bottom: 4px;
+  left: 3px;
+  right: 3px;
+  font-size: clamp(8px, 2vw, 10px);
+}
+
+.camera {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  z-index: 3;
+  font-size: 15px;
+}
+
+.square .person {
+  display: none;
+}
+
+.square.has-photo .person {
+  display: block;
+  position: absolute;
+  top: 5px;
+  left: 32px;
+  right: 4px;
+  z-index: 3;
+  font-size: 9px;
+  font-weight: 700;
+  background: #244735e8;
+  color: white;
+  padding: 4px;
+  border-radius: 4px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.remove-photo {
+  display: none;
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  z-index: 5;
+  width: 25px;
+  height: 25px;
+  padding: 0;
+  border-radius: 50%;
+  background: #a12e32;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.square.has-photo .remove-photo {
+  display: block;
+}
+
+.square.completed {
+  border: 2px solid #e6bd64;
+}
+
+/* Instructions below grid */
+.info {
+  background: #244735;
+  color: white;
+  padding: 12px;
+  border-radius: 10px;
+  margin-top: 12px;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.progress {
+  color: #e8cf91;
+  font-weight: 700;
+  font-size: 17px;
+  margin-bottom: 4px;
+}
+
+.rules {
+  font-size: 11px;
+  color: #fffaf0;
+}
+
+#message {
+  font-family: 'Playfair Display', serif;
+  color: #a12e32;
+  font-size: 20px;
+  margin: 12px 0;
+  min-height: 25px;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin: 12px 0;
+  flex-wrap: wrap;
+}
+
+button {
+  font-family: inherit;
+  font-weight: 700;
+}
+
+.actions button {
+  padding: 10px 17px;
+  border: none;
+  border-radius: 25px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.reset {
+  background: #a12e32;
+  color: white;
+}
+
+.save {
+  background: #244735;
+  color: white;
+}
+
+footer {
+  font-size: 9px;
+  color: #8a8b79;
+  margin-top: 15px;
+  letter-spacing: 1px;
+}
+
+/* Compact mobile screen */
+@media (max-width: 400px) {
+  body {
+    padding: 6px 8px 18px;
+  }
+
+  header {
+    padding: 2px 0 7px;
+  }
+
+  h1 {
+    font-size: 30px;
+  }
+
+  .decoration {
+    margin: 3px;
+  }
+
+  .board {
+    gap: 5px;
+    padding: 6px;
+  }
+
+  .square {
+    padding: 3px;
+  }
+
+  .square .prompt {
+    font-size: 9px;
+    padding: 3px;
+  }
+
+  .info {
+    padding: 9px;
+    margin-top: 9px;
+  }
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<header>
+  <div class="decoration">✦ ❄️ ✦</div>
+  <div class="eyebrow">THE MOST WONDERFUL TIME OF THE YEAR</div>
+  <h1>IB Christmas<br>Photo Bingo</h1>
+  <p class="subtitle">
+    Capture the memories, meet your colleagues and spread the Christmas cheer!
+  </p>
+  <div class="decoration">🎄 🎁 🦌</div>
+</header>
+
+<div class="board" id="board"></div>
+
+<!-- Instructions moved to bottom of photo grid -->
+<div class="info">
+  <div class="progress" id="progress">
+    0/9 squares completed to win
+  </div>
+
+  <div class="rules">
+    📸 Tap a square to take or upload a portrait photo.<br>
+    👥 Enter the person's name after uploading.<br>
+    🚫 Feature 9 different people outside your team
+  </div>
+</div>
+
+<div id="message"></div>
+
+<div class="actions">
+  <button class="reset" onclick="resetBoard()">↻ Reset board</button>
+  <button class="save" onclick="saveBoard()">↓ Save bingo board</button>
+</div>
+
+<footer>
+  MADE WITH LOVE & A LITTLE CHRISTMAS MAGIC ✨
+</footer>
+
+</div>
+
+<script>
+const challenges = [
+  ["🤝", "Someone you have a tied case with"],
+  ["📱", "Has 67 in their personal/work phone"],
+  ["⚖️", "Who served at least 10 charges at once"],
+  ["👨‍👩‍👧", "Has a family member in SPF"],
+  ["❤️", "Your work bestie"],
+  ["💪", "Can do 80 push ups"],
+  ["📂", "Does not have any ePIR"],
+  ["🎭", "Strike a funny pose with any OC"],
+  ["⭐", "> 15 years in SPF"]
+];
+
+const board = document.getElementById("board");
+let entries = Array(9).fill(null);
+
+function createBoard() {
+  board.innerHTML = "";
+
+  challenges.forEach((item, index) => {
+    const square = document.createElement("div");
+    square.className = "square";
+
+    square.innerHTML = `
+      <span class="emoji">${item[0]}</span>
+      <span class="prompt">${item[1]}</span>
+      <span class="camera">📷</span>
+      <span class="person"></span>
+      <img alt="${item[1]}">
+      <button class="remove-photo" type="button"
+        title="Remove photo">✕</button>
+      <input type="file" accept="image/*"
+        capture="environment" style="display:none">
+    `;
+
+    const input = square.querySelector("input");
+    const img = square.querySelector("img");
+    const person = square.querySelector(".person");
+    const removeButton = square.querySelector(".remove-photo");
+
+    square.addEventListener("click", () => input.click());
+
+    input.addEventListener("change", (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const name = prompt(
+        "Enter the person's name:"
+      );
+
+      if (!name || !name.trim()) {
+        input.value = "";
+        return;
+      }
+
+      const cleanName = name.trim();
+
+      const duplicate = entries.some((entry, i) =>
+        i !== index &&
+        entry &&
+        entry.name.toLowerCase() === cleanName.toLowerCase()
+      );
+
+      if (duplicate) {
+        alert(
+          "🚫 No repeats allowed!\n\n" +
+          cleanName + " is already featured in another square. " +
+          "Please choose someone else."
+        );
+        input.value = "";
+        return;
+      }
+
+      const reader = new FileReader();
+
+      reader.onload = (e) => {
+        entries[index] = {
+          photo: e.target.result,
+          name: cleanName
+        };
+
+        img.src = e.target.result;
+        person.textContent = cleanName;
+        square.classList.add("has-photo", "completed");
+
+        updateProgress();
+      };
+
+      reader.readAsDataURL(file);
+    });
+
+    removeButton.addEventListener("click", (event) => {
+      event.stopPropagation();
+
+      if (!entries[index]) return;
+
+      if (!confirm("Remove this photo and person's name?")) return;
+
+      entries[index] = null;
+      img.src = "";
+      person.textContent = "";
+      input.value = "";
+
+      square.classList.remove("has-photo", "completed");
+
+      updateProgress();
+    });
+
+    if (entries[index]) {
+      img.src = entries[index].photo;
+      person.textContent = entries[index].name;
+      square.classList.add("has-photo", "completed");
+    }
+
+    board.appendChild(square);
+  });
+
+  updateProgress();
+}
+
+function updateProgress() {
+  const count = entries.filter(e => e !== null).length;
+
+  document.getElementById("progress").textContent =
+    `${count}/9 squares completed to win`;
+
+  const message = document.getElementById("message");
+
+  if (count === 9) {
+    message.textContent =
+      "🎉 BINGO! YOU WIN! MERRY CHRISTMAS! 🎄";
+  } else {
+    message.textContent = "";
+  }
+}
+
+function resetBoard() {
+  if (!confirm(
+    "Start a new game? All photos and names will be cleared."
+  )) return;
+
+  entries = Array(9).fill(null);
+  createBoard();
+}
+
+function saveBoard() {
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d");
+
+  const size = 1050;
+  const gap = 12;
+  const cellWidth = (size - gap * 4) / 3;
+  const cellHeight = cellWidth * 4 / 3;
+
+  canvas.width = size;
+  canvas.height = 1550;
+
+  ctx.fillStyle = "#f5eee2";
+  ctx.fillRect(0, 0, size, canvas.height);
+
+  ctx.fillStyle = "#a12e32";
+  ctx.textAlign = "center";
+  ctx.font = "bold 58px Georgia";
+  ctx.fillText("IB Christmas Photo Bingo", size/2, 85);
+
+  ctx.fillStyle = "#244735";
+  ctx.font = "23px Arial";
+  ctx.fillText("9 different people. No repeats!", size/2, 130);
+
+  const images = entries.map(entry => {
+    if (!entry) return null;
+    const img = new Image();
+    img.src = entry.photo;
+    return img;
+  });
+
+  let remaining = images.filter(Boolean).length;
+
+  function drawBoard() {
+    challenges.forEach((item, i) => {
+      const x = gap + (i % 3) * (cellWidth + gap);
+      const y = 165 + Math.floor(i / 3) * (cellHeight + gap);
+
+      ctx.fillStyle = "#fffaf0";
+      ctx.fillRect(x, y, cellWidth, cellHeight);
+
+      if (entries[i] && images[i].complete) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(x, y, cellWidth, cellHeight);
+        ctx.clip();
+        ctx.drawImage(images[i], x, y, cellWidth, cellHeight);
+        ctx.restore();
+
+        ctx.fillStyle = "#244735";
+        ctx.fillRect(x, y + cellHeight - 75, cellWidth, 75);
+
+        ctx.fillStyle = "#ffffff";
+        ctx.textAlign = "center";
+        ctx.font = "bold 19px Arial";
+        ctx.fillText(
+          entries[i].name.substring(0, 28),
+          x + cellWidth/2,
+          y + cellHeight - 48
+        );
+
+        ctx.font = "15px Arial";
+        ctx.fillText(
+          item[1],
+          x + cellWidth/2,
+          y + cellHeight - 20,
+          cellWidth - 12
+        );
+      } else {
+        ctx.fillStyle = "#244735";
+        ctx.textAlign = "center";
+        ctx.font = "bold 22px Arial";
+        ctx.fillText(
+          item[1],
+          x + cellWidth/2,
+          y + cellHeight/2,
+          cellWidth - 20
+        );
+      }
+    });
+
+    ctx.fillStyle = "#244735";
+    ctx.font = "24px Georgia";
+    ctx.fillText("Merry Christmas! ✨", size/2, 1460);
+
+    const link = document.createElement("a");
+    link.download = "IB-Christmas-Photo-Bingo.png";
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+  }
+
+  if (remaining === 0) {
+    drawBoard();
+  } else {
+    images.forEach(img => {
+      if (!img) return;
+      img.onload = () => {
+        remaining--;
+        if (remaining === 0) drawBoard();
+      };
+    });
+  }
+}
+
+createBoard();
+</script>
+</body>
+</html>
